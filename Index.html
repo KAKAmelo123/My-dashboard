@@ -1,0 +1,1150 @@
+<!DOCTYPE html>
+<html lang="fr" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>Mon Dashboard</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0f0f14;--card:#1a1a24;--card2:#22222e;--border:#2c2c3c;
+  --text:#f0f0f8;--muted:#686880;--radius:16px;--rsm:10px;
+  --accent:#1a8cff;--green:#2eb872;--red:#e05252;--gold:#f5a623;--purple:#c084fc;
+}
+[data-theme="light"]{
+  --bg:#f2f2f7;--card:#ffffff;--card2:#f7f7fb;--border:#e2e2ec;
+  --text:#0f0f14;--muted:#9999aa;
+}
+html,body{height:100%;background:var(--bg);font-family:-apple-system,BlinkMacSystemFont,'SF Pro Display',sans-serif;color:var(--text);}
+.app{max-width:430px;margin:0 auto;min-height:100vh;padding-bottom:86px;position:relative;}
+
+/* ── Section tints ── */
+.tint-swim   { background: linear-gradient(180deg,rgba(14,90,160,.35) 0%,transparent 280px); }
+.tint-muscu  { background: linear-gradient(180deg,rgba(60,60,60,.5)  0%,transparent 280px); }
+.tint-trade-pos { background: linear-gradient(180deg,rgba(10,50,20,.55) 0%,transparent 280px); }
+.tint-trade-neg { background: linear-gradient(180deg,rgba(50,10,10,.55) 0%,transparent 280px); }
+.tint-lifestyle { background: linear-gradient(180deg,rgba(100,30,160,.3) 0%,transparent 280px); }
+.tint-cours  { background: linear-gradient(180deg,rgba(240,240,255,.06) 0%,transparent 280px); }
+[data-theme="light"] .tint-swim    { background: linear-gradient(180deg,rgba(14,90,180,.10) 0%,transparent 280px); }
+[data-theme="light"] .tint-muscu   { background: linear-gradient(180deg,rgba(100,100,110,.10) 0%,transparent 280px); }
+[data-theme="light"] .tint-trade-pos { background: linear-gradient(180deg,rgba(10,100,40,.08) 0%,transparent 280px); }
+[data-theme="light"] .tint-trade-neg { background: linear-gradient(180deg,rgba(160,20,20,.07) 0%,transparent 280px); }
+[data-theme="light"] .tint-lifestyle { background: linear-gradient(180deg,rgba(140,40,220,.07) 0%,transparent 280px); }
+[data-theme="light"] .tint-cours   { background: linear-gradient(180deg,rgba(0,0,40,.04) 0%,transparent 280px); }
+
+/* ── Status & Header ── */
+.statusbar{display:flex;justify-content:space-between;align-items:center;padding:12px 20px 4px;font-size:12px;font-weight:600;color:var(--muted);}
+.header{padding:6px 20px 14px;display:flex;align-items:center;gap:10px;}
+.header h1{font-size:26px;font-weight:800;color:var(--text);flex:1;}
+.icon-btn{width:38px;height:38px;border-radius:50%;background:var(--card2);border:.5px solid var(--border);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--muted);font-size:18px;flex-shrink:0;transition:opacity .15s;}
+.icon-btn:active{opacity:.6;}
+.avatar{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,#1a8cff,#00d4aa);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:#fff;flex-shrink:0;}
+
+/* ── Content & Pages ── */
+.content{padding:0 16px 16px;}
+.page{display:none;animation:fu .22s ease;}
+.page.active{display:block;}
+@keyframes fu{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+/* ── Tab bar ── */
+.tabbar{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:430px;max-width:100vw;background:var(--card);border-top:.5px solid var(--border);display:flex;padding:8px 0 20px;z-index:100;}
+.tabitem{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;color:var(--muted);font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;transition:color .15s;}
+.tabitem.active{color:var(--accent);}
+.tabitem i{font-size:21px;}
+
+/* ── Sub-tabs ── */
+.subtabs{display:flex;gap:8px;margin-bottom:16px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none;}
+.subtabs::-webkit-scrollbar{display:none;}
+.stab{padding:8px 18px;border-radius:20px;font-size:13px;font-weight:700;border:1px solid var(--border);background:var(--card2);color:var(--muted);cursor:pointer;white-space:nowrap;flex-shrink:0;transition:all .15s;}
+.stab.active{background:var(--accent);color:#fff;border-color:var(--accent);}
+.subpage{display:none;}.subpage.active{display:block;}
+
+/* ── Generic cards ── */
+.card{background:var(--card);border:.5px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:12px;}
+.card2{background:var(--card2);border-radius:var(--rsm);padding:12px;}
+.seclbl{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;margin:18px 0 10px;}
+
+/* ── Stats grid ── */
+.sgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:14px;}
+.scard{background:var(--card2);border-radius:var(--rsm);padding:14px;}
+.slbl{font-size:11px;color:var(--muted);margin-bottom:4px;}
+.sval{font-size:22px;font-weight:800;color:var(--text);}
+.sunit{font-size:12px;font-weight:400;color:var(--muted);}
+
+/* ── FAB ── */
+.fab{position:fixed;bottom:94px;right:calc(50% - 215px + 16px);width:54px;height:54px;border-radius:50%;background:var(--accent);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 6px 24px rgba(26,140,255,.4);z-index:99;transition:transform .15s;}
+.fab:active{transform:scale(.9);}
+.fab i{font-size:26px;color:#fff;}
+
+/* ── Modals ── */
+.overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:200;display:none;align-items:flex-end;justify-content:center;backdrop-filter:blur(6px);}
+.overlay.open{display:flex;}
+.modal{width:100%;max-width:430px;background:var(--card);border-radius:24px 24px 0 0;padding:20px 20px 44px;max-height:92vh;overflow-y:auto;}
+.mhandle{width:40px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 18px;}
+.modal h2{font-size:20px;font-weight:800;margin-bottom:18px;}
+.fg{margin-bottom:12px;}
+.fg label{display:block;font-size:11px;font-weight:700;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:.07em;}
+.fg input,.fg select,.fg textarea{width:100%;padding:12px 14px;border-radius:var(--rsm);border:1px solid var(--border);background:var(--card2);color:var(--text);font-size:15px;font-family:inherit;outline:none;transition:border-color .15s;}
+.fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--accent);}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.frow3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
+.calcbox{background:var(--card2);border-radius:var(--rsm);padding:14px;margin-bottom:12px;display:flex;justify-content:space-around;}
+.citem{text-align:center;}
+.cval{font-size:20px;font-weight:800;color:var(--text);}
+.clbl{font-size:11px;color:var(--muted);}
+.disc-big{font-size:30px;font-weight:900;color:var(--accent);text-align:center;margin:4px 0;}
+.rng{width:100%;margin:4px 0 12px;accent-color:var(--accent);}
+.btn{width:100%;padding:14px;border-radius:var(--radius);font-size:15px;font-weight:800;border:none;cursor:pointer;transition:opacity .15s;display:block;}
+.btn:active{opacity:.8;}
+.btnp{background:var(--accent);color:#fff;}
+.btng{background:transparent;color:var(--muted);border:1px solid var(--border);margin-top:8px;}
+
+/* ── Colors ── */
+.pos{color:var(--green);}.neg{color:var(--red);}
+.td-buy{background:rgba(46,184,114,.12);color:var(--green);}
+.td-sell{background:rgba(224,82,82,.12);color:var(--red);}
+.swim-c{color:#38bdf8;}
+.swim-card{background:rgba(14,90,160,.15);border:.5px solid rgba(56,189,248,.18);}
+[data-theme="light"] .swim-card{background:rgba(14,90,180,.07);}
+
+/* ── Home quick cards ── */
+.hgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:14px;}
+.hcard{background:var(--card);border:.5px solid var(--border);border-radius:var(--radius);padding:14px;cursor:pointer;transition:transform .15s,opacity .15s;}
+.hcard:active{transform:scale(.96);opacity:.85;}
+.hcico{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:10px;}
+.hclbl{font-size:11px;color:var(--muted);margin-bottom:2px;}
+.hcval{font-size:22px;font-weight:900;color:var(--text);}
+
+/* ── Week grid ── */
+.wgrid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin-bottom:14px;}
+.wday{background:var(--card);border:.5px solid var(--border);border-radius:var(--rsm);padding:8px 3px;text-align:center;cursor:pointer;transition:all .15s;}
+.wday.active{background:var(--accent);border-color:var(--accent);}
+.wday.has{border-color:#666;}
+.wdname{font-size:9px;color:var(--muted);font-weight:700;text-transform:uppercase;}
+.wday.active .wdname,.wday.active .wdsess{color:#fff;}
+.wdsess{font-size:9px;font-weight:700;color:var(--text);margin-top:3px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;}
+.wdot{width:5px;height:5px;border-radius:50%;background:var(--green);margin:3px auto 0;}
+
+/* ── Exercise blocks ── */
+.exblock{background:var(--card);border:.5px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:10px;}
+.exhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+.exname{font-size:14px;font-weight:800;color:var(--text);}
+.exgrp{font-size:11px;color:var(--muted);background:var(--card2);padding:2px 8px;border-radius:8px;}
+.setscol{display:flex;flex-direction:column;gap:6px;}
+.setrow{display:grid;grid-template-columns:26px 1fr 1fr 26px;gap:8px;align-items:center;}
+.setbadge{width:22px;height:22px;border-radius:50%;background:var(--card2);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--muted);}
+.setin{padding:8px;border-radius:8px;border:1px solid var(--border);background:var(--card2);color:var(--text);font-size:14px;font-weight:700;text-align:center;width:100%;outline:none;}
+.setin:focus{border-color:var(--accent);}
+.setdel{background:transparent;border:none;color:var(--muted);cursor:pointer;padding:0;display:flex;align-items:center;justify-content:center;}
+.addsetbtn{width:100%;padding:8px;border-radius:8px;border:1px dashed var(--border);background:transparent;color:var(--accent);font-size:13px;font-weight:700;cursor:pointer;margin-top:6px;}
+
+/* ── Session template cards ── */
+.sesscard{background:var(--card);border:.5px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:8px;cursor:pointer;transition:opacity .15s;}
+.sesscard:active{opacity:.7;}
+.sesshead{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;}
+.sessname{font-size:15px;font-weight:800;color:var(--text);}
+.sesscount{font-size:11px;color:var(--muted);background:var(--card2);padding:2px 8px;border-radius:8px;}
+.exchips{display:flex;flex-wrap:wrap;gap:5px;}
+.exchip{font-size:11px;color:var(--muted);background:var(--card2);padding:2px 8px;border-radius:8px;}
+
+/* ── PNL hero ── */
+.pnlhero{background:var(--card);border:.5px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:14px;}
+.pnllbl{font-size:12px;color:var(--muted);margin-bottom:4px;}
+.pnlbig{font-size:38px;font-weight:900;}
+.pnlstats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:14px;}
+.pnls{text-align:center;}
+.pnlsv{font-size:16px;font-weight:800;color:var(--text);}
+.pnlsl{font-size:10px;color:var(--muted);}
+.chartwrap{position:relative;height:140px;}
+
+/* ── Trade rows ── */
+.traderow{background:var(--card);border:.5px solid var(--border);border-radius:var(--rsm);padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;gap:12px;}
+.tradedir{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.trinfo{flex:1;min-width:0;}
+.trpair{font-size:14px;font-weight:800;color:var(--text);}
+.trmeta{font-size:11px;color:var(--muted);}
+.trright{text-align:right;flex-shrink:0;}
+.trpips{font-size:15px;font-weight:800;}
+
+/* ── Budget ── */
+.bcat{margin-bottom:14px;}
+.bcath{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;}
+.bcatn{font-size:13px;font-weight:700;color:var(--text);}
+.bcatamt{font-size:12px;color:var(--muted);}
+.bbarw{height:6px;background:var(--card2);border-radius:3px;overflow:hidden;}
+.bbar{height:100%;border-radius:3px;transition:width .5s;}
+.bok{background:var(--accent);}.bwarn{background:var(--gold);}.bover{background:var(--red);}
+.bcatdel{background:transparent;border:none;color:var(--muted);cursor:pointer;font-size:14px;padding:2px 6px;}
+
+/* ── Habits ── */
+.hrow{background:var(--card);border:.5px solid var(--border);border-radius:var(--rsm);padding:12px 14px;margin-bottom:8px;display:flex;align-items:center;gap:12px;}
+.hemi{font-size:22px;flex-shrink:0;}
+.hname{flex:1;font-size:14px;font-weight:700;color:var(--text);}
+.hbtn{width:36px;height:36px;border-radius:50%;border:1.5px solid var(--border);background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;transition:all .15s;}
+.hbtn.y{background:rgba(46,184,114,.15);border-color:var(--green);color:var(--green);}
+.hbtn.n{background:rgba(224,82,82,.15);border-color:var(--red);color:var(--red);}
+.hdel{background:transparent;border:none;color:var(--muted);cursor:pointer;font-size:14px;display:flex;align-items:center;}
+
+/* ── Tasks ── */
+.taskrow{display:flex;align-items:center;gap:10px;padding:8px 0;border-top:.5px solid var(--border);cursor:pointer;}
+.tchk{width:20px;height:20px;border-radius:50%;border:1.5px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .15s;}
+.tchk.done{background:var(--green);border-color:var(--green);}
+.ttxt{flex:1;font-size:13px;color:var(--text);}
+.ttxt.done{text-decoration:line-through;color:var(--muted);}
+.ttag{font-size:10px;padding:2px 7px;border-radius:8px;font-weight:700;}
+
+/* ── Prog bar ── */
+.progwrap{height:8px;background:var(--card2);border-radius:4px;overflow:hidden;margin-top:8px;}
+.progbar{height:100%;border-radius:4px;background:var(--green);transition:width .4s;}
+
+/* ── Settings ── */
+.srow{display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:.5px solid var(--border);}
+.srow:last-child{border-bottom:none;}
+.stitle{font-size:14px;font-weight:700;color:var(--text);}
+.ssub{font-size:11px;color:var(--muted);}
+.toggle{width:46px;height:26px;border-radius:13px;background:var(--card2);border:1px solid var(--border);cursor:pointer;position:relative;transition:background .2s;}
+.toggle.on{background:var(--accent);}
+.tknob{width:20px;height:20px;border-radius:50%;background:#fff;position:absolute;top:2px;left:2px;transition:left .2s;box-shadow:0 1px 4px rgba(0,0,0,.4);}
+.toggle.on .tknob{left:22px;}
+.emiinput{width:54px;padding:6px;border-radius:8px;border:1px solid var(--border);background:var(--card2);color:var(--text);font-size:20px;text-align:center;outline:none;}
+
+/* ── Muscu home prog ── */
+.mhprow{display:flex;align-items:center;gap:8px;margin-bottom:12px;}
+.mhpname{font-size:13px;font-weight:700;color:var(--text);min-width:0;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.mhpdiff{font-size:13px;font-weight:800;flex-shrink:0;}
+.mhpbar{flex:1;height:4px;background:var(--card2);border-radius:2px;overflow:hidden;max-width:80px;}
+.mhpfill{height:100%;border-radius:2px;}
+
+/* ── Empty ── */
+.empty{text-align:center;padding:32px 20px;color:var(--muted);font-size:14px;}
+.empty i{font-size:38px;display:block;margin-bottom:8px;opacity:.35;}
+
+/* ── Toast ── */
+.toast{position:fixed;top:56px;left:50%;transform:translateX(-50%) translateY(-10px);background:var(--text);color:var(--bg);padding:10px 22px;border-radius:20px;font-size:13px;font-weight:700;z-index:600;opacity:0;transition:all .25s;pointer-events:none;white-space:nowrap;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+</style>
+</head>
+<body>
+<div class="app" id="app">
+
+<!-- ==================== HOME ==================== -->
+<div id="page-home" class="page active">
+  <div class="statusbar"><span id="clock">9:41</span><div style="display:flex;gap:5px;"><i class="ti ti-wifi" style="font-size:13px;"></i><i class="ti ti-battery" style="font-size:13px;"></i></div></div>
+  <div class="header">
+    <div class="icon-btn" onclick="goTab('settings')"><i class="ti ti-settings"></i></div>
+    <h1>Dashboard</h1>
+    <div class="avatar" id="home-avatar">TK</div>
+  </div>
+  <div class="content">
+    <div class="card" style="margin-bottom:14px;">
+      <div style="font-size:12px;color:var(--muted);" id="hday"></div>
+      <div style="font-size:20px;font-weight:800;margin-bottom:10px;" id="hdate"></div>
+      <span style="background:rgba(245,166,35,.15);color:var(--gold);padding:4px 12px;border-radius:20px;font-size:12px;font-weight:800;">🔥 7 jours de série</span>
+    </div>
+    <div class="seclbl">Vue rapide</div>
+    <div class="hgrid">
+      <div class="hcard" onclick="goTab('sport')">
+        <div class="hcico" style="background:rgba(60,60,60,.4);"><span id="emo-sport">🏋️</span></div>
+        <div class="hclbl">Muscu aujourd'hui</div>
+        <div class="hcval" id="hc-muscu">—</div>
+      </div>
+      <div class="hcard" onclick="goTab('finance')">
+        <div class="hcico" style="background:rgba(46,184,114,.12);"><span id="emo-trading">📈</span></div>
+        <div class="hclbl">PNL du mois</div>
+        <div class="hcval pos" id="hc-pnl">+0 $</div>
+      </div>
+      <div class="hcard" onclick="goTab('lifestyle')">
+        <div class="hcico" style="background:rgba(192,132,252,.12);"><span id="emo-lifestyle">💜</span></div>
+        <div class="hclbl">Habitudes du jour</div>
+        <div class="hcval" id="hc-habits">0/0</div>
+      </div>
+      <div class="hcard" onclick="goTab('cours')">
+        <div class="hcico" style="background:rgba(240,240,255,.07);"><span id="emo-cours">📚</span></div>
+        <div class="hclbl">Cours</div>
+        <div class="hcval" id="hc-cours">0 tâche</div>
+      </div>
+    </div>
+    <div class="seclbl">Progression musculation</div>
+    <div class="card" id="home-muscu-prog"><div class="empty"><i class="ti ti-barbell"></i>Lance ta première séance</div></div>
+    <div class="seclbl">Derniers trades</div>
+    <div id="home-trades"><div class="empty" style="padding:16px 0;"><i class="ti ti-chart-candle"></i>Aucun trade</div></div>
+  </div>
+</div>
+
+<!-- ==================== SPORT ==================== -->
+<div id="page-sport" class="page">
+  <div class="statusbar"><span id="clock2">9:41</span></div>
+  <div class="header">
+    <h1>Sport</h1>
+    <div class="icon-btn" style="color:#38bdf8;border-color:rgba(56,189,248,.25);"><i class="ti ti-swimming"></i></div>
+  </div>
+  <div class="content">
+    <div class="subtabs">
+      <div class="stab active" onclick="switchSub('sport','swim',this)">Natation</div>
+      <div class="stab" onclick="switchSub('sport','muscu',this)">Musculation</div>
+    </div>
+
+    <!-- SWIM -->
+    <div id="sport-swim" class="subpage active">
+      <div class="sgrid">
+        <div class="scard swim-card"><div class="slbl">Distance mensuelle</div><div class="sval swim-c" id="sw-dist">18 400<span class="sunit"> m</span></div></div>
+        <div class="scard swim-card"><div class="slbl">Séances ce mois</div><div class="sval swim-c" id="sw-sess">8</div></div>
+        <div class="scard swim-card" style="grid-column:span 2;"><div class="slbl">Distance moyenne / séance</div><div class="sval swim-c" id="sw-avg">2 300<span class="sunit"> m</span></div></div>
+      </div>
+      <div class="seclbl">Séances récentes</div>
+      <div id="swim-sessions-list"></div>
+    </div>
+
+    <!-- MUSCU -->
+    <div id="sport-muscu" class="subpage">
+      <div class="seclbl">Semaine en cours</div>
+      <div class="wgrid" id="week-grid"></div>
+      <div id="day-content"></div>
+      <div class="seclbl">Séances enregistrées</div>
+      <div id="sessions-list"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== FINANCE ==================== -->
+<div id="page-finance" class="page">
+  <div class="statusbar"><span></span></div>
+  <div class="header">
+    <h1>Finance</h1>
+    <div class="icon-btn"><i class="ti ti-chart-line"></i></div>
+  </div>
+  <div class="content">
+    <div class="subtabs">
+      <div class="stab active" onclick="switchSub('finance','trading',this)">Trading</div>
+      <div class="stab" onclick="switchSub('finance','gestion',this)">Gestion</div>
+    </div>
+
+    <!-- TRADING -->
+    <div id="finance-trading" class="subpage active">
+      <div class="pnlhero" id="pnlhero">
+        <div class="pnllbl">PNL du mois</div>
+        <div class="pnlbig pos" id="pnl-big">+0 $</div>
+        <div class="pnlstats">
+          <div class="pnls"><div class="pnlsv pos" id="st-wins">0</div><div class="pnlsl">Wins</div></div>
+          <div class="pnls"><div class="pnlsv neg" id="st-losses">0</div><div class="pnlsl">Losses</div></div>
+          <div class="pnls"><div class="pnlsv" id="st-wr">—</div><div class="pnlsl">Win %</div></div>
+          <div class="pnls"><div class="pnlsv" id="st-rr">—</div><div class="pnlsl">RR moy.</div></div>
+        </div>
+        <div style="margin-top:10px;font-size:12px;color:var(--muted);">Discipline moy. : <span id="st-disc" style="font-weight:800;color:var(--accent);">—</span></div>
+      </div>
+      <div class="card" style="padding:14px;">
+        <div style="font-size:13px;font-weight:800;margin-bottom:10px;">Courbe PNL cumulé</div>
+        <div class="chartwrap"><canvas id="pnlChart"></canvas></div>
+      </div>
+      <div class="seclbl">Journal des trades</div>
+      <div id="trades-list"><div class="empty"><i class="ti ti-chart-candle"></i>Appuie sur + pour logger ton premier trade</div></div>
+    </div>
+
+    <!-- GESTION -->
+    <div id="finance-gestion" class="subpage">
+      <div class="card">
+        <div class="pnllbl">Solde total — <span id="gest-month">Mai 2025</span></div>
+        <div style="font-size:34px;font-weight:900;color:var(--text);" id="gest-solde">2 480 €</div>
+        <div style="display:flex;gap:16px;margin-top:10px;">
+          <div style="font-size:12px;color:var(--muted);">Entrées <span style="font-weight:800;color:var(--green);" id="gest-in">+3 200 €</span></div>
+          <div style="font-size:12px;color:var(--muted);">Sorties <span style="font-weight:800;color:var(--red);" id="gest-out">-2 560 €</span></div>
+        </div>
+      </div>
+      <div class="seclbl">Budget par catégorie</div>
+      <div class="card" id="budget-wrap"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== LIFESTYLE ==================== -->
+<div id="page-lifestyle" class="page tint-lifestyle">
+  <div class="statusbar"><span></span></div>
+  <div class="header">
+    <h1>Lifestyle</h1>
+    <div class="icon-btn" style="color:var(--purple);border-color:rgba(192,132,252,.25);"><i class="ti ti-heart"></i></div>
+  </div>
+  <div class="content">
+    <div class="card" style="margin-bottom:14px;">
+      <div style="font-size:12px;color:var(--muted);margin-bottom:4px;">Score du jour</div>
+      <div style="font-size:36px;font-weight:900;"><span id="ls-done">0</span><span style="font-size:16px;font-weight:400;color:var(--muted);"> / <span id="ls-total">0</span> habitudes</span></div>
+      <div class="progwrap"><div class="progbar" id="ls-bar" style="width:0%"></div></div>
+    </div>
+    <div class="seclbl">Habitudes du jour</div>
+    <div id="habits-list"></div>
+  </div>
+</div>
+
+<!-- ==================== COURS ==================== -->
+<div id="page-cours" class="page tint-cours">
+  <div class="statusbar"><span></span></div>
+  <div class="header">
+    <h1>Cours & Agenda</h1>
+    <div class="icon-btn"><i class="ti ti-book"></i></div>
+  </div>
+  <div class="content">
+    <div class="card" style="margin-bottom:12px;">
+      <div style="font-size:16px;font-weight:800;margin-bottom:12px;" id="cours-date-label">Lundi 12 mai</div>
+      <div id="tasks-today"></div>
+    </div>
+    <div class="card">
+      <div style="font-size:14px;font-weight:800;margin-bottom:10px;">Mar. 13 mai</div>
+      <div class="taskrow"><div class="tchk"></div><div class="ttxt">TD Comptabilité — feuille 5</div><span class="ttag" style="background:rgba(56,189,248,.15);color:#38bdf8;">Compta</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== SETTINGS ==================== -->
+<div id="page-settings" class="page">
+  <div class="statusbar"><span></span></div>
+  <div class="header">
+    <div class="icon-btn" onclick="goTab('home')"><i class="ti ti-arrow-left"></i></div>
+    <h1>Paramètres</h1>
+  </div>
+  <div class="content">
+    <div class="seclbl">Apparence</div>
+    <div class="card">
+      <div class="srow">
+        <div><div class="stitle">Thème sombre</div><div class="ssub">Mode nuit</div></div>
+        <div class="toggle on" id="theme-tog" onclick="toggleTheme()"><div class="tknob"></div></div>
+      </div>
+    </div>
+    <div class="seclbl">Émojis des activités</div>
+    <div class="card">
+      <div class="srow"><div><div class="stitle">Sport / Muscu</div></div><input class="emiinput" id="ei-sport" value="🏋️" maxlength="2" oninput="setEmoji('sport',this.value)"></div>
+      <div class="srow"><div><div class="stitle">Natation</div></div><input class="emiinput" id="ei-swim" value="🏊" maxlength="2" oninput="setEmoji('swim',this.value)"></div>
+      <div class="srow"><div><div class="stitle">Trading</div></div><input class="emiinput" id="ei-trading" value="📈" maxlength="2" oninput="setEmoji('trading',this.value)"></div>
+      <div class="srow"><div><div class="stitle">Lifestyle</div></div><input class="emiinput" id="ei-lifestyle" value="💜" maxlength="2" oninput="setEmoji('lifestyle',this.value)"></div>
+      <div class="srow"><div><div class="stitle">Cours</div></div><input class="emiinput" id="ei-cours" value="📚" maxlength="2" oninput="setEmoji('cours',this.value)"></div>
+    </div>
+    <div class="seclbl">Compte</div>
+    <div class="card">
+      <div class="srow">
+        <div><div class="stitle">Initiales</div><div class="ssub">Affiché sur l'avatar</div></div>
+        <input style="width:80px;padding:8px;border-radius:8px;border:1px solid var(--border);background:var(--card2);color:var(--text);font-size:14px;text-align:center;outline:none;" value="TK" maxlength="3" oninput="document.getElementById('home-avatar').textContent=this.value.toUpperCase()||'?'">
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TAB BAR -->
+<nav class="tabbar">
+  <div class="tabitem active" id="tab-home" onclick="goTab('home')"><i class="ti ti-home"></i><span>Accueil</span></div>
+  <div class="tabitem" id="tab-sport" onclick="goTab('sport')"><i class="ti ti-swimming"></i><span>Sport</span></div>
+  <div class="tabitem" id="tab-finance" onclick="goTab('finance')"><i class="ti ti-chart-line"></i><span>Finance</span></div>
+  <div class="tabitem" id="tab-lifestyle" onclick="goTab('lifestyle')"><i class="ti ti-heart"></i><span>Lifestyle</span></div>
+  <div class="tabitem" id="tab-cours" onclick="goTab('cours')"><i class="ti ti-book"></i><span>Cours</span></div>
+</nav>
+</div><!-- end .app -->
+
+<button class="fab" id="fab" onclick="openFAB()"><i class="ti ti-plus"></i></button>
+<div class="toast" id="toast"></div>
+
+<!-- ===== MODAL TRADE ===== -->
+<div class="overlay" id="ov-trade">
+<div class="modal">
+  <div class="mhandle"></div><h2>Nouveau trade</h2>
+  <div class="frow">
+    <div class="fg"><label>Paire</label>
+      <select id="t-devise"><option>EUR/USD</option><option>GBP/USD</option><option>USD/JPY</option><option>GBP/JPY</option><option>USD/CHF</option><option>AUD/USD</option><option>NZD/USD</option><option>XAU/USD</option><option>US30</option><option>NAS100</option></select>
+    </div>
+    <div class="fg"><label>Direction</label><select id="t-dir"><option value="long">Long ↑</option><option value="short">Short ↓</option></select></div>
+  </div>
+  <div class="frow">
+    <div class="fg"><label>Date</label><input type="date" id="t-date"></div>
+    <div class="fg"><label>Heure</label><input type="time" id="t-time"></div>
+  </div>
+  <div class="frow3">
+    <div class="fg"><label>Entrée (PE)</label><input type="number" id="t-pe" placeholder="1.0820" step="any" oninput="calcTrade()"></div>
+    <div class="fg"><label>Stop Loss</label><input type="number" id="t-sl" placeholder="1.0800" step="any" oninput="calcTrade()"></div>
+    <div class="fg"><label>Take Profit</label><input type="number" id="t-tp" placeholder="1.0860" step="any" oninput="calcTrade()"></div>
+  </div>
+  <div class="calcbox">
+    <div class="citem"><div class="cval" id="c-rr">—</div><div class="clbl">Risk/Reward</div></div>
+    <div class="citem"><div class="cval" id="c-psl">—</div><div class="clbl">Pips SL</div></div>
+    <div class="citem"><div class="cval" id="c-ptp">—</div><div class="clbl">Pips TP</div></div>
+  </div>
+  <div class="frow">
+    <div class="fg"><label>Résultat</label><select id="t-result"><option value="">En cours</option><option value="win">Win ✓</option><option value="loss">Loss ✗</option></select></div>
+    <div class="fg"><label>PNL ($)</label><input type="number" id="t-pnl" placeholder="ex: 45"></div>
+  </div>
+  <div class="fg">
+    <label>Discipline</label>
+    <div class="disc-big"><span id="disc-num">7</span>/10</div>
+    <input type="range" class="rng" min="1" max="10" value="7" id="t-disc" oninput="document.getElementById('disc-num').textContent=this.value">
+  </div>
+  <div class="fg"><label>Notes / avis</label><textarea id="t-note" rows="2" placeholder="Configuration, émotions, points d'amélioration..." style="resize:none;"></textarea></div>
+  <button class="btn btnp" onclick="saveTrade()">Enregistrer le trade</button>
+  <button class="btn btng" onclick="closeOv('ov-trade')">Annuler</button>
+</div></div>
+
+<!-- ===== MODAL HABIT ===== -->
+<div class="overlay" id="ov-habit">
+<div class="modal">
+  <div class="mhandle"></div><h2>Nouvelle habitude</h2>
+  <div class="fg"><label>Nom</label><input type="text" id="h-name" placeholder="Ex: Méditation, Hydratation..."></div>
+  <div class="fg"><label>Emoji</label><input type="text" id="h-emoji" placeholder="🧘 💧 📖 🏃" maxlength="2"></div>
+  <button class="btn btnp" onclick="saveHabit()">Ajouter</button>
+  <button class="btn btng" onclick="closeOv('ov-habit')">Annuler</button>
+</div></div>
+
+<!-- ===== MODAL SESSION ===== -->
+<div class="overlay" id="ov-session">
+<div class="modal">
+  <div class="mhandle"></div><h2 id="msess-title">Nouvelle séance type</h2>
+  <div class="fg"><label>Nom de la séance</label><input type="text" id="ms-name" placeholder="Ex: Push 1, Pull, Legs..."></div>
+  <div id="ms-exlist"></div>
+  <button class="btn btng" onclick="addExModal()" style="margin-bottom:10px;"><i class="ti ti-plus"></i> Ajouter un exercice</button>
+  <button class="btn btnp" onclick="saveSession()">Enregistrer</button>
+  <button class="btn btng" onclick="closeOv('ov-session')">Annuler</button>
+</div></div>
+
+<!-- ===== MODAL ASSIGN DAY ===== -->
+<div class="overlay" id="ov-assign">
+<div class="modal">
+  <div class="mhandle"></div><h2 id="assign-title">Assigner une séance</h2>
+  <p style="font-size:13px;color:var(--muted);margin-bottom:14px;">Choisis la séance pour ce jour :</p>
+  <div id="assign-list"></div>
+  <button class="btn btng" onclick="assignDay(null)">Repos ce jour</button>
+  <button class="btn btng" onclick="closeOv('ov-assign')">Annuler</button>
+</div></div>
+
+<!-- ===== MODAL BUDGET ===== -->
+<div class="overlay" id="ov-budget">
+<div class="modal">
+  <div class="mhandle"></div><h2>Nouvelle catégorie</h2>
+  <div class="fg"><label>Nom</label><input type="text" id="bc-name" placeholder="Ex: Abonnements, Essence..."></div>
+  <div class="frow">
+    <div class="fg"><label>Dépensé (€)</label><input type="number" id="bc-spent" placeholder="0"></div>
+    <div class="fg"><label>Budget max (€)</label><input type="number" id="bc-max" placeholder="200"></div>
+  </div>
+  <button class="btn btnp" onclick="saveBudget()">Ajouter</button>
+  <button class="btn btng" onclick="closeOv('ov-budget')">Annuler</button>
+</div></div>
+
+<script>
+// ====== STATE ======
+let trades = [];
+let habits = [
+  {id:1,name:'Hydratation (2L)',emoji:'💧',status:null},
+  {id:2,name:'Méditation',emoji:'🧘',status:null},
+  {id:3,name:'Lecture 30 min',emoji:'📖',status:null},
+  {id:4,name:'Sommeil 8h',emoji:'😴',status:null},
+];
+// Sessions: template avec exercices
+let sessions = [
+  {id:1,name:'Push 1',exercises:[
+    {name:'Développé couché',group:'Pecs'},
+    {name:'Écarté poulie haute',group:'Pecs'},
+    {name:'Développé militaire',group:'Épaules'},
+    {name:'Élévations latérales',group:'Épaules'},
+    {name:'Triceps corde',group:'Triceps'},
+  ]},
+  {id:2,name:'Pull 1',exercises:[
+    {name:'Tractions',group:'Dos'},
+    {name:'Rowing barre',group:'Dos'},
+    {name:'Face pull',group:'Épaules arrière'},
+    {name:'Curl barre',group:'Biceps'},
+  ]},
+  {id:3,name:'Legs',exercises:[
+    {name:'Squat',group:'Quadriceps'},
+    {name:'Leg press',group:'Quadriceps'},
+    {name:'Fentes',group:'Fessiers'},
+    {name:'Soulevé de terre roumain',group:'Ischio'},
+  ]},
+];
+// weekPlan[dayIdx] = {sessionId, sets:{exIdx:[{kg,reps},...]} }
+let weekPlan = {};
+// sessionHistory[sessionId] = [{date, exercises:[{name,group,sets:[{kg,reps}]}]}]
+let sessionHistory = {};
+// swimSessions = [{date, distance, duration, style}]
+let swimSessions = [
+  {date:'2025-05-11',distance:2400,duration:'1h02',style:'Crawl'},
+  {date:'2025-05-08',distance:2000,duration:'55min',style:'Crawl/Dos'},
+  {date:'2025-05-05',distance:2400,duration:'1h05',style:'Crawl'},
+  {date:'2025-05-02',distance:2200,duration:'58min',style:'Crawl'},
+];
+let budgetCats = [
+  {id:1,name:'Loyer / fixe',spent:900,max:900},
+  {id:2,name:'Alimentation',spent:380,max:400},
+  {id:3,name:'Loisirs',spent:120,max:200},
+  {id:4,name:'Sport',spent:45,max:80},
+];
+let tasks = [
+  {id:1,text:"Revoir chap. 3 — Analyse technique",tag:"Finance",tc:"rgba(46,184,114,.15)",tx:"var(--green)",done:true},
+  {id:2,text:"Exercices taux d'intérêt (p.87-92)",tag:"Maths",tc:"rgba(245,166,35,.15)",tx:"var(--gold)",done:false},
+  {id:3,text:"Préparer présentation marketing",tag:"Projet",tc:"rgba(192,132,252,.15)",tx:"var(--purple)",done:false},
+];
+const DAYS=['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
+let selectedDay=0, assigningDay=null, editingSessionId=null, exCnt=0;
+let pnlChart=null, currentPage='home';
+
+// ====== NAV ======
+function goTab(name){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tabitem').forEach(t=>t.classList.remove('active'));
+  document.getElementById('page-'+name).classList.add('active');
+  const ti=document.getElementById('tab-'+name);
+  if(ti) ti.classList.add('active');
+  currentPage=name;
+  document.getElementById('fab').style.display=name==='settings'?'none':'flex';
+  if(name==='finance'){setTimeout(()=>{renderPnlChart();updateTradingTint();},80);}
+  if(name==='sport') renderMuscu();
+  if(name==='lifestyle') renderHabits();
+  if(name==='home') renderHome();
+  if(name==='cours') renderTasks();
+  if(name==='finance') renderBudget();
+}
+function switchSub(page,sub,el){
+  document.querySelectorAll('#page-'+page+' .subpage').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('#page-'+page+' .stab').forEach(t=>t.classList.remove('active'));
+  document.getElementById(page+'-'+sub).classList.add('active');
+  el.classList.add('active');
+  if(page==='finance'&&sub==='trading') setTimeout(renderPnlChart,80);
+  if(page==='finance'&&sub==='gestion') renderBudget();
+}
+
+// ====== FAB ======
+function openFAB(){
+  if(currentPage==='finance'){
+    // Check which sub is active
+    const isTrade=document.getElementById('finance-trading').classList.contains('active');
+    if(isTrade) openOv('ov-trade');
+    else openOv('ov-budget');
+  } else if(currentPage==='lifestyle') openOv('ov-habit');
+  else if(currentPage==='sport') {editingSessionId=null; openNewSessionModal();}
+  else toast('Fonctionnalité à venir !');
+}
+function openOv(id){document.getElementById(id).classList.add('open');}
+function closeOv(id){document.getElementById(id).classList.remove('open');}
+
+// ====== THEME ======
+function toggleTheme(){
+  const html=document.documentElement;
+  const dark=html.getAttribute('data-theme')==='dark';
+  html.setAttribute('data-theme',dark?'light':'dark');
+  const tog=document.getElementById('theme-tog');
+  tog.classList.toggle('on',!dark);
+}
+
+// ====== EMOJI ======
+function setEmoji(key,val){
+  const el=document.getElementById('emo-'+key);
+  if(el) el.textContent=val||'?';
+}
+
+// ====== TRADE ======
+function calcTrade(){
+  const dev=document.getElementById('t-devise').value;
+  const pe=parseFloat(document.getElementById('t-pe').value);
+  const sl=parseFloat(document.getElementById('t-sl').value);
+  const tp=parseFloat(document.getElementById('t-tp').value);
+  if(!pe||!sl||!tp) return;
+  const isJpy=dev.includes('JPY')||dev==='XAU/USD'||dev==='US30'||dev==='NAS100';
+  const pip=isJpy?0.01:0.0001;
+  const psl=Math.abs(Math.round((pe-sl)/pip));
+  const ptp=Math.abs(Math.round((tp-pe)/pip));
+  const rr=psl>0?(ptp/psl).toFixed(2):'—';
+  document.getElementById('c-rr').textContent=rr==='—'?'—':'1:'+rr;
+  document.getElementById('c-psl').textContent=psl+' pips';
+  document.getElementById('c-ptp').textContent=ptp+' pips';
+}
+function saveTrade(){
+  const dev=document.getElementById('t-devise').value;
+  const dir=document.getElementById('t-dir').value;
+  const date=document.getElementById('t-date').value;
+  const time=document.getElementById('t-time').value;
+  const pe=parseFloat(document.getElementById('t-pe').value);
+  const sl=parseFloat(document.getElementById('t-sl').value);
+  const tp=parseFloat(document.getElementById('t-tp').value);
+  if(!pe||!sl||!tp){toast('Remplis PE, SL et TP');return;}
+  const isJpy=dev.includes('JPY')||dev==='XAU/USD'||dev==='US30'||dev==='NAS100';
+  const pip=isJpy?0.01:0.0001;
+  const psl=Math.abs(Math.round((pe-sl)/pip));
+  const ptp=Math.abs(Math.round((tp-pe)/pip));
+  const rr=psl>0?parseFloat((ptp/psl).toFixed(2)):0;
+  const result=document.getElementById('t-result').value;
+  const pnl=parseFloat(document.getElementById('t-pnl').value)||0;
+  const disc=parseInt(document.getElementById('t-disc').value);
+  const note=document.getElementById('t-note').value;
+  trades.unshift({id:Date.now(),dev,dir,date,time,pe,sl,tp,psl,ptp,rr,result,pnl,disc,note});
+  closeOv('ov-trade'); resetTradeForm();
+  renderTrades(); renderPnlChart(); updateTradingTint(); renderHome();
+  saveAll();
+  toast('Trade enregistré ✓');
+}
+function resetTradeForm(){
+  ['t-pe','t-sl','t-tp','t-pnl','t-note'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('t-disc').value=7;
+  document.getElementById('disc-num').textContent='7';
+  document.getElementById('t-result').value='';
+  document.getElementById('c-rr').textContent='—';
+  document.getElementById('c-psl').textContent='—';
+  document.getElementById('c-ptp').textContent='—';
+  const now=new Date();
+  document.getElementById('t-date').value=now.toISOString().split('T')[0];
+  document.getElementById('t-time').value=now.toTimeString().slice(0,5);
+}
+function renderTrades(){
+  const el=document.getElementById('trades-list');
+  if(!trades.length){el.innerHTML='<div class="empty"><i class="ti ti-chart-candle"></i>Appuie sur + pour logger ton premier trade</div>';updateTradeStats();return;}
+  el.innerHTML=trades.map(t=>`
+    <div class="traderow">
+      <div class="tradedir ${t.dir==='long'?'td-buy':'td-sell'}">
+        <i class="ti ti-arrow-${t.dir==='long'?'up':'down'}-right" style="font-size:20px;"></i>
+      </div>
+      <div class="trinfo">
+        <div class="trpair">${t.dev} · ${t.dir==='long'?'Long':'Short'}</div>
+        <div class="trmeta">PE ${t.pe} · SL ${t.sl} · TP ${t.tp}</div>
+        <div class="trmeta">RR 1:${t.rr} · Disc. ${t.disc}/10</div>
+      </div>
+      <div class="trright">
+        <div class="trpips ${t.result==='win'?'pos':t.result==='loss'?'neg':''}">${t.result==='win'?'+'+t.ptp+'p':t.result==='loss'?'-'+t.psl+'p':'~'+t.ptp+'p'}</div>
+        <div style="font-size:11px;color:var(--muted);">${t.result==='win'?'Win ✓':t.result==='loss'?'Loss ✗':'En cours'}</div>
+        ${t.pnl?`<div class="trpips ${t.pnl>=0?'pos':'neg'}" style="font-size:13px;">${t.pnl>=0?'+':''}${t.pnl}$</div>`:''}
+      </div>
+    </div>`).join('');
+  updateTradeStats();
+}
+function updateTradeStats(){
+  const done=trades.filter(t=>t.result);
+  const wins=trades.filter(t=>t.result==='win').length;
+  const losses=trades.filter(t=>t.result==='loss').length;
+  const total=trades.reduce((a,t)=>a+t.pnl,0);
+  const wr=done.length?Math.round(wins/done.length*100)+'%':'—';
+  const avgRR=done.length?'1:'+(done.reduce((a,t)=>a+t.rr,0)/done.length).toFixed(2):'—';
+  const avgD=trades.length?(trades.reduce((a,t)=>a+t.disc,0)/trades.length).toFixed(1)+'/10':'—';
+  document.getElementById('pnl-big').textContent=(total>=0?'+':'')+total.toFixed(0)+' $';
+  document.getElementById('pnl-big').className='pnlbig '+(total>=0?'pos':'neg');
+  document.getElementById('st-wins').textContent=wins;
+  document.getElementById('st-losses').textContent=losses;
+  document.getElementById('st-wr').textContent=wr;
+  document.getElementById('st-rr').textContent=avgRR;
+  document.getElementById('st-disc').textContent=avgD;
+  // Home
+  const hpnl=document.getElementById('hc-pnl');
+  hpnl.textContent=(total>=0?'+':'')+total.toFixed(0)+' $';
+  hpnl.className='hcval '+(total>=0?'pos':'neg');
+}
+function updateTradingTint(){
+  const pf=document.getElementById('page-finance');
+  const total=trades.reduce((a,t)=>a+t.pnl,0);
+  pf.className='page active '+(total>=0?'tint-trade-pos':'tint-trade-neg');
+}
+function renderPnlChart(){
+  const canvas=document.getElementById('pnlChart'); if(!canvas) return;
+  const sorted=[...trades].filter(t=>t.result).sort((a,b)=>new Date(a.date+' '+a.time)-new Date(b.date+' '+b.time));
+  let cum=0, data=[0];
+  sorted.forEach(t=>{cum+=t.pnl; data.push(parseFloat(cum.toFixed(2)));});
+  const isPos=cum>=0, color=isPos?'#2eb872':'#e05252';
+  if(pnlChart){pnlChart.destroy();pnlChart=null;}
+  pnlChart=new Chart(canvas,{
+    type:'line',
+    data:{labels:data.map((_,i)=>i),datasets:[{data,borderColor:color,backgroundColor:isPos?'rgba(46,184,114,.07)':'rgba(224,82,82,.07)',fill:true,tension:.45,pointRadius:data.length>6?2:4,borderWidth:2.5}]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+      scales:{x:{display:false},y:{grid:{color:'rgba(128,128,128,0.07)'},ticks:{font:{size:10},color:color,callback:v=>(v>=0?'+':'')+v+'$'}}}}
+  });
+}
+
+// ====== SWIM STATS ======
+function renderSwimStats(){
+  const m=swimSessions, tot=m.reduce((a,s)=>a+s.distance,0);
+  document.getElementById('sw-dist').innerHTML=tot.toLocaleString()+'<span class="sunit"> m</span>';
+  document.getElementById('sw-sess').textContent=m.length;
+  document.getElementById('sw-avg').innerHTML=m.length?Math.round(tot/m.length).toLocaleString()+'<span class="sunit"> m</span>':'0';
+  const sl=document.getElementById('swim-sessions-list');
+  sl.innerHTML=m.map(s=>`
+    <div class="card" style="padding:14px;margin-bottom:10px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+        <span style="font-weight:800;">${formatDate(s.date)}</span>
+        <span style="color:var(--muted);font-size:13px;">${s.duration}</span>
+      </div>
+      <div style="display:flex;gap:16px;flex-wrap:wrap;">
+        <div style="font-size:12px;color:var(--muted);">Distance<br><span style="font-weight:800;color:#38bdf8;font-size:16px;">${s.distance.toLocaleString()} m</span></div>
+        <div style="font-size:12px;color:var(--muted);">Longueurs<br><span style="font-weight:800;color:var(--text);font-size:16px;">${Math.round(s.distance/60)} lap</span></div>
+        <div style="font-size:12px;color:var(--muted);">Nage<br><span style="font-weight:800;color:var(--text);font-size:16px;">${s.style}</span></div>
+      </div>
+    </div>`).join('');
+}
+function formatDate(d){
+  const days=['Dim.','Lun.','Mar.','Mer.','Jeu.','Ven.','Sam.'];
+  const months=['jan','fév','mars','avr','mai','juin','juil','août','sep','oct','nov','déc'];
+  const dt=new Date(d); return days[dt.getDay()]+' '+dt.getDate()+' '+months[dt.getMonth()];
+}
+
+// ====== MUSCU ======
+function renderMuscu(){ renderWeekGrid(); renderDayContent(); renderSessionsList(); }
+function getSession(id){ return sessions.find(s=>s.id===id); }
+function renderWeekGrid(){
+  document.getElementById('week-grid').innerHTML=DAYS.map((d,i)=>{
+    const p=weekPlan[i], active=selectedDay===i;
+    const sname=p?getSession(p.sessionId)?.name||'?':'—';
+    return `<div class="wday ${active?'active':''} ${p&&!active?'has':''}" onclick="selectDay(${i})">
+      <div class="wdname">${d}</div>
+      <div class="wdsess">${sname}</div>
+      ${p&&!active?'<div class="wdot"></div>':''}
+    </div>`;
+  }).join('');
+}
+function selectDay(i){
+  selectedDay=i;
+  if(weekPlan[i]){renderWeekGrid();renderDayContent();}
+  else{assigningDay=i;openAssignModal();}
+}
+function openAssignModal(){
+  document.getElementById('assign-title').textContent='Séance — '+DAYS[assigningDay];
+  document.getElementById('assign-list').innerHTML=sessions.length
+    ?sessions.map(s=>`<button class="btn btng" style="margin-bottom:8px;text-align:left;" onclick="assignDay(${s.id})">${s.name} · ${s.exercises.length} exos</button>`).join('')
+    :'<p style="color:var(--muted);font-size:13px;margin-bottom:12px;">Crée d\'abord une séance type (bouton +).</p>';
+  openOv('ov-assign');
+}
+function assignDay(sessionId){
+  if(sessionId===null){weekPlan[assigningDay]=null;}
+  else{
+    const s=getSession(sessionId); if(!s) return;
+    // Keep existing sets if same session, else fresh init
+    const existing=weekPlan[assigningDay];
+    if(!existing||existing.sessionId!==sessionId){
+      const sets={};
+      s.exercises.forEach((_,i)=>{sets[i]=[{kg:'',reps:''}];});
+      weekPlan[assigningDay]={sessionId,sets};
+    }
+  }
+  closeOv('ov-assign'); renderMuscu(); updateTodayMuscu(); saveAll();
+}
+function updateTodayMuscu(){
+  const todayIdx=(new Date().getDay()+6)%7;
+  const p=weekPlan[todayIdx];
+  document.getElementById('hc-muscu').textContent=p?getSession(p.sessionId)?.name||'—':'—';
+}
+function renderDayContent(){
+  const cont=document.getElementById('day-content');
+  const plan=weekPlan[selectedDay];
+  if(!plan){cont.innerHTML=`<div class="empty" style="padding:20px 0;"><i class="ti ti-moon"></i>Repos — clique pour assigner</div>`;return;}
+  const sess=getSession(plan.sessionId); if(!sess){cont.innerHTML='';return;}
+  cont.innerHTML=`
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+      <div style="font-size:16px;font-weight:800;">${DAYS[selectedDay]} — ${sess.name}</div>
+      <button onclick="clearDay()" style="background:transparent;border:none;color:var(--muted);cursor:pointer;font-size:13px;">Effacer</button>
+    </div>
+    ${sess.exercises.map((ex,ei)=>{
+      const sets=plan.sets[ei]||[{kg:'',reps:''}];
+      return `<div class="exblock">
+        <div class="exhead"><span class="exname">${ex.name}</span><span class="exgrp">${ex.group}</span></div>
+        <div class="setscol" id="sc-${ei}">${sets.map((s,si)=>setRowHTML(ei,si,s)).join('')}</div>
+        <button class="addsetbtn" onclick="addSet(${ei})"><i class="ti ti-plus"></i> Série</button>
+      </div>`;
+    }).join('')}
+    <button class="btn btnp" style="margin-top:8px;" onclick="saveWorkout()">💾 Enregistrer la séance</button>`;
+}
+function setRowHTML(ei,si,s){
+  return `<div class="setrow" id="sr-${ei}-${si}">
+    <div class="setbadge">${si+1}</div>
+    <input class="setin" type="number" placeholder="kg" value="${s.kg||''}" onchange="updateSet(${ei},${si},'kg',this.value)">
+    <input class="setin" type="number" placeholder="reps" value="${s.reps||''}" onchange="updateSet(${ei},${si},'reps',this.value)">
+    <button class="setdel" onclick="removeSet(${ei},${si})"><i class="ti ti-x" style="font-size:14px;color:var(--muted);"></i></button>
+  </div>`;
+}
+function updateSet(ei,si,field,val){
+  const p=weekPlan[selectedDay]; if(!p||!p.sets[ei]) return;
+  p.sets[ei][si][field]=val;
+  saveAll();
+}
+function addSet(ei){
+  const p=weekPlan[selectedDay]; if(!p) return;
+  if(!p.sets[ei]) p.sets[ei]=[];
+  p.sets[ei].push({kg:'',reps:''});
+  renderDayContent();
+}
+function removeSet(ei,si){
+  const p=weekPlan[selectedDay]; if(!p||!p.sets[ei]) return;
+  if(p.sets[ei].length>1){p.sets[ei].splice(si,1);renderDayContent();}
+}
+function clearDay(){weekPlan[selectedDay]=null;renderMuscu();saveAll();}
+function saveWorkout(){
+  const p=weekPlan[selectedDay]; if(!p) return;
+  const sess=getSession(p.sessionId); if(!sess) return;
+  // Deep copy sets as record, keyed to sessionId
+  const record={
+    date:new Date().toISOString().split('T')[0],
+    day:DAYS[selectedDay],
+    exercises:sess.exercises.map((ex,ei)=>({
+      name:ex.name,group:ex.group,
+      sets:(p.sets[ei]||[]).map(s=>({kg:parseFloat(s.kg)||0,reps:parseInt(s.reps)||0})).filter(s=>s.kg||s.reps)
+    }))
+  };
+  if(!sessionHistory[p.sessionId]) sessionHistory[p.sessionId]=[];
+  sessionHistory[p.sessionId].unshift(record);
+  renderMuscuHomeProgress();
+  saveAll();
+  toast('Séance enregistrée ✓');
+}
+function renderSessionsList(){
+  const el=document.getElementById('sessions-list');
+  if(!sessions.length){el.innerHTML='<div class="empty">Appuie sur + pour créer une séance</div>';return;}
+  el.innerHTML=sessions.map(s=>`
+    <div class="sesscard" onclick="editSession(${s.id})">
+      <div class="sesshead"><span class="sessname">${s.name}</span><span class="sesscount">${s.exercises.length} exos</span></div>
+      <div class="exchips">${s.exercises.map(e=>`<span class="exchip">${e.name}</span>`).join('')}</div>
+    </div>`).join('');
+}
+function openNewSessionModal(){
+  document.getElementById('msess-title').textContent='Nouvelle séance type';
+  document.getElementById('ms-name').value='';
+  document.getElementById('ms-exlist').innerHTML='';
+  exCnt=0; addExModal(); addExModal(); addExModal();
+  openOv('ov-session');
+}
+function editSession(id){
+  const s=sessions.find(s=>s.id===id); if(!s) return;
+  editingSessionId=id;
+  document.getElementById('msess-title').textContent='Modifier : '+s.name;
+  document.getElementById('ms-name').value=s.name;
+  document.getElementById('ms-exlist').innerHTML='';
+  exCnt=0;
+  s.exercises.forEach(ex=>addExModal(ex.name,ex.group));
+  openOv('ov-session');
+}
+function addExModal(name='',group=''){
+  exCnt++;
+  const div=document.createElement('div');
+  div.className='frow'; div.style.marginBottom='8px';
+  div.innerHTML=`<input type="text" placeholder="Exercice" value="${name}"><input type="text" placeholder="Groupe musculaire" value="${group}">`;
+  document.getElementById('ms-exlist').appendChild(div);
+}
+function saveSession(){
+  const name=document.getElementById('ms-name').value.trim();
+  if(!name){toast('Nomme la séance');return;}
+  const rows=document.getElementById('ms-exlist').querySelectorAll('.frow');
+  const exs=[];
+  rows.forEach(r=>{
+    const ins=r.querySelectorAll('input');
+    const n=ins[0].value.trim(),g=ins[1].value.trim();
+    if(n) exs.push({name:n,group:g||'Général'});
+  });
+  if(!exs.length){toast('Ajoute au moins un exercice');return;}
+  if(editingSessionId){
+    const idx=sessions.findIndex(s=>s.id===editingSessionId);
+    if(idx>=0){
+      sessions[idx]={...sessions[idx],name,exercises:exs};
+      // Repair weekPlan sets if session modified
+      Object.keys(weekPlan).forEach(day=>{
+        const p=weekPlan[day];
+        if(p&&p.sessionId===editingSessionId){
+          const ns={};
+          exs.forEach((_,i)=>{ns[i]=p.sets[i]||[{kg:'',reps:''}];});
+          weekPlan[day].sets=ns;
+        }
+      });
+    }
+    editingSessionId=null;
+  } else {
+    sessions.push({id:Date.now(),name,exercises:exs});
+  }
+  closeOv('ov-session'); renderMuscu();
+  saveAll();
+  toast('Séance sauvegardée ✓');
+}
+
+// ====== MUSCU HOME PROGRESS ======
+function renderMuscuHomeProgress(){
+  const el=document.getElementById('home-muscu-prog');
+  const allRec=Object.values(sessionHistory).flat();
+  if(!allRec.length){el.innerHTML='<div class="empty"><i class="ti ti-barbell"></i>Lance ta première séance pour voir ta progression</div>';return;}
+  // Group by exercise, track avg kg over sessions
+  const exMap={};
+  [...allRec].sort((a,b)=>new Date(a.date)-new Date(b.date)).forEach(rec=>{
+    rec.exercises.forEach(ex=>{
+      const maxKg=ex.sets.length?Math.max(...ex.sets.map(s=>s.kg||0)):0;
+      if(maxKg>0){
+        if(!exMap[ex.name]) exMap[ex.name]=[];
+        exMap[ex.name].push(maxKg);
+      }
+    });
+  });
+  const names=Object.keys(exMap).slice(0,4);
+  if(!names.length){el.innerHTML='<div class="empty"><i class="ti ti-barbell"></i>Remplis tes séances pour voir la progression</div>';return;}
+  el.innerHTML='<div style="padding:4px 0;">'+names.map(n=>{
+    const pts=exMap[n], first=pts[0], last=pts[pts.length-1], diff=+(last-first).toFixed(1);
+    const pct=first>0?Math.min(100,Math.round(last/first*100)):100;
+    return `<div class="mhprow">
+      <div class="mhpname">${n}</div>
+      <div class="mhpbar"><div class="mhpfill" style="width:${pct}%;background:${diff>=0?'var(--green)':'var(--red)'}"></div></div>
+      <div class="mhpdiff" style="color:${diff>=0?'var(--green)':'var(--red)'};">${diff>=0?'+':''}${diff} kg</div>
+    </div>`;
+  }).join('')+'</div>';
+}
+
+// ====== HABITS ======
+function renderHabits(){
+  const el=document.getElementById('habits-list');
+  if(!habits.length){el.innerHTML='<div class="empty">Appuie sur + pour ajouter une habitude</div>';updateLsScore();return;}
+  el.innerHTML=habits.map(h=>`
+    <div class="hrow">
+      <div class="hemi">${h.emoji||'⭕'}</div>
+      <div class="hname">${h.name}</div>
+      <div style="display:flex;gap:8px;">
+        <button class="hbtn ${h.status===true?'y':''}" onclick="setHabit(${h.id},true)"><i class="ti ti-check" style="font-size:15px;"></i></button>
+        <button class="hbtn ${h.status===false?'n':''}" onclick="setHabit(${h.id},false)"><i class="ti ti-x" style="font-size:15px;"></i></button>
+      </div>
+      <button class="hdel" onclick="delHabit(${h.id})"><i class="ti ti-trash" style="font-size:14px;"></i></button>
+    </div>`).join('');
+  updateLsScore();
+}
+function setHabit(id,val){
+  const h=habits.find(h=>h.id===id); if(!h) return;
+  h.status=h.status===val?null:val;
+  renderHabits(); renderHome(); saveAll();
+}
+function delHabit(id){habits=habits.filter(h=>h.id!==id);renderHabits();renderHome();saveAll();}
+function saveHabit(){
+  const name=document.getElementById('h-name').value.trim();
+  if(!name){toast('Saisis un nom');return;}
+  const emoji=document.getElementById('h-emoji').value||'⭕';
+  habits.push({id:Date.now(),name,emoji,status:null});
+  document.getElementById('h-name').value='';document.getElementById('h-emoji').value='';
+  closeOv('ov-habit'); renderHabits(); renderHome();
+  saveAll();
+  toast('Habitude ajoutée ✓');
+}
+function updateLsScore(){
+  const done=habits.filter(h=>h.status===true).length, tot=habits.length;
+  document.getElementById('ls-done').textContent=done;
+  document.getElementById('ls-total').textContent=tot;
+  document.getElementById('ls-bar').style.width=(tot?Math.round(done/tot*100):0)+'%';
+}
+
+// ====== BUDGET ======
+function renderBudget(){
+  const el=document.getElementById('budget-wrap');
+  el.innerHTML=budgetCats.map(c=>{
+    const pct=c.max>0?Math.min(100,Math.round(c.spent/c.max*100)):0;
+    const cls=pct>=100?'bover':pct>=80?'bwarn':'bok';
+    return `<div class="bcat">
+      <div class="bcath">
+        <span class="bcatn">${c.name}</span>
+        <div style="display:flex;align-items:center;gap:6px;">
+          <span class="bcatamt">${c.spent} / ${c.max} €</span>
+          <button class="bcatdel" onclick="delBudget(${c.id})"><i class="ti ti-trash" style="font-size:13px;"></i></button>
+        </div>
+      </div>
+      <div class="bbarw"><div class="bbar ${cls}" style="width:${pct}%;"></div></div>
+    </div>`;
+  }).join('')+`<button class="btn btng" style="margin-top:6px;" onclick="openOv('ov-budget')"><i class="ti ti-plus"></i> Ajouter une catégorie</button>`;
+}
+function delBudget(id){budgetCats=budgetCats.filter(c=>c.id!==id);renderBudget();saveAll();}
+function saveBudget(){
+  const name=document.getElementById('bc-name').value.trim();
+  if(!name){toast('Nomme la catégorie');return;}
+  const spent=parseFloat(document.getElementById('bc-spent').value)||0;
+  const max=parseFloat(document.getElementById('bc-max').value)||0;
+  budgetCats.push({id:Date.now(),name,spent,max});
+  ['bc-name','bc-spent','bc-max'].forEach(id=>document.getElementById(id).value='');
+  closeOv('ov-budget'); renderBudget(); saveAll();
+  toast('Catégorie ajoutée ✓');
+}
+
+// ====== TASKS ======
+function renderTasks(){
+  document.getElementById('tasks-today').innerHTML=tasks.map(t=>`
+    <div class="taskrow" onclick="toggleTask(${t.id})">
+      <div class="tchk ${t.done?'done':''}">${t.done?'<i class="ti ti-check" style="font-size:11px;color:#fff;"></i>':''}</div>
+      <div class="ttxt ${t.done?'done':''}">${t.text}</div>
+      <span class="ttag" style="background:${t.tc};color:${t.tx};">${t.tag}</span>
+    </div>`).join('');
+}
+function toggleTask(id){const t=tasks.find(t=>t.id===id);if(t){t.done=!t.done;renderTasks();updateCours();saveAll();}}
+function updateCours(){
+  const rem=tasks.filter(t=>!t.done).length;
+  document.getElementById('hc-cours').textContent=rem+' tâche'+(rem>1?'s':'');
+}
+
+// ====== HOME ======
+function renderHome(){
+  updateTodayMuscu(); updateTradeStats(); updateLsScore(); updateCours();
+  // habits card
+  const done=habits.filter(h=>h.status===true).length;
+  document.getElementById('hc-habits').textContent=done+'/'+habits.length;
+  // last 2 trades
+  const ht=document.getElementById('home-trades');
+  if(!trades.length){ht.innerHTML='<div class="empty" style="padding:16px 0;"><i class="ti ti-chart-candle"></i>Aucun trade</div>';return;}
+  ht.innerHTML=trades.slice(0,2).map(t=>`
+    <div class="traderow">
+      <div class="tradedir ${t.dir==='long'?'td-buy':'td-sell'}">
+        <i class="ti ti-arrow-${t.dir==='long'?'up':'down'}-right" style="font-size:18px;"></i>
+      </div>
+      <div class="trinfo">
+        <div class="trpair">${t.dev} · ${t.dir==='long'?'Long':'Short'}</div>
+        <div class="trmeta">${t.result==='win'?'Win ✓':t.result==='loss'?'Loss ✗':'En cours'} · Disc ${t.disc}/10</div>
+      </div>
+      <div class="trright">
+        <div class="trpips ${t.pnl>=0?'pos':'neg'}">${t.pnl>=0?'+':''}${t.pnl}$</div>
+      </div>
+    </div>`).join('');
+}
+
+// ====== PERSISTENCE ======
+const LS_KEY = 'dashboard_v1';
+function saveAll(){
+  try{
+    localStorage.setItem(LS_KEY, JSON.stringify({
+      trades, habits, sessions, weekPlan, sessionHistory,
+      swimSessions, budgetCats, tasks
+    }));
+  } catch(e){ console.warn('save failed',e); }
+}
+function loadAll(){
+  try{
+    const raw = localStorage.getItem(LS_KEY);
+    if(!raw) return false;
+    const d = JSON.parse(raw);
+    if(d.trades)         trades         = d.trades;
+    if(d.habits)         habits         = d.habits;
+    if(d.sessions)       sessions       = d.sessions;
+    if(d.weekPlan)       weekPlan       = d.weekPlan;
+    if(d.sessionHistory) sessionHistory = d.sessionHistory;
+    if(d.swimSessions)   swimSessions   = d.swimSessions;
+    if(d.budgetCats)     budgetCats     = d.budgetCats;
+    if(d.tasks)          tasks          = d.tasks;
+    return true;
+  } catch(e){ return false; }
+}
+
+// ====== CLOCK & DATE ======
+function updateClock(){
+  const now=new Date();
+  const t=now.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
+  document.getElementById('clock').textContent=t;
+  document.getElementById('clock2').textContent=t;
+}
+setInterval(updateClock,1000); updateClock();
+
+// ====== TOAST ======
+function toast(msg){
+  const el=document.getElementById('toast');
+  el.textContent=msg; el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'),2300);
+}
+
+// ====== INIT ======
+window.onload=()=>{
+  const now=new Date();
+  const ds=['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
+  const ms=['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
+  document.getElementById('hday').textContent=ds[now.getDay()];
+  document.getElementById('hdate').textContent=now.getDate()+' '+ms[now.getMonth()]+' '+now.getFullYear();
+  const coursLabel=document.getElementById('cours-date-label');
+  if(coursLabel) coursLabel.textContent=ds[now.getDay()]+' '+now.getDate()+' '+ms[now.getMonth()];
+
+  // Load saved data
+  const loaded = loadAll();
+  if(loaded) toast('✓ Données restaurées');
+
+  resetTradeForm();
+  renderTrades(); renderHabits(); renderMuscu(); renderSwimStats();
+  renderBudget(); renderTasks(); renderHome();
+};
+</script>
+</body>
+</html>
